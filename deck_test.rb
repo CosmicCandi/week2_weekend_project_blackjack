@@ -21,11 +21,14 @@ class Deck_Test < MiniTest::Test
     player1 = Deck.new
     card_sample = player1.cards.select {|suit| suit.suit == "Diamonds"}
     assert card_sample.length == 13
-
   end
 
   # A deck contains four of each face of cards
   def test_a_deck_contains_four_of_each_face_of_cards
+    face_count = []
+    player1 = Deck.new
+    face_count = player1.cards.select {|face| face.face == "King"}
+    assert face_count.length == 4
   end
 
   # A deck is shuffled on creation

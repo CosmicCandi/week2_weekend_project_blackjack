@@ -29,6 +29,15 @@ class Card
     end
   end
 
+  def to_s
+    if face == "Ace"
+      "an #{face} of #{suit}"
+    elsif face == 8
+      "an #{face} of #{suit}"
+    else
+      "a #{face} of #{suit}"
+    end
+  end
 
   def <=>(other)
     if other.is_a? Card
@@ -41,9 +50,15 @@ class Card
 end
 
 # Testing to see that new card objects had the proper value
-# player1_card1 = Card.new("Diamonds","2")
+# player1_card1 = Card.new("Spades","2")
 # player1_card2 = Card.new("Diamonds", "Ace")
-# player1_card3 = Card.new("Diamonds", "King")
+# player1_card3 = Card.new("Hearts", "King")
+# player1_card4 = Card.new("Clubs", 8)
 # puts player1_card1.inspect
+# puts player1_card1.declaration
 # puts player1_card2.inspect
+# puts player1_card2.declaration
 # puts player1_card3.inspect
+# puts player1_card3.declaration
+# puts player1_card4.inspect
+# puts player1_card4.declaration

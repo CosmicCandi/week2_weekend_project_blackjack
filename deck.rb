@@ -1,3 +1,4 @@
+# card.rb : your Card class
 require './card.rb'
 
 class Deck

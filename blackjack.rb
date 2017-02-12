@@ -1,17 +1,161 @@
 # Deliverables
 # A repo containing at least:
 # blackjack.rb : your game class
-# card.rb : your Card class
 # deck.rb : your Deck class
+require 'pry'
+require_relative 'deck'
+require 'tty'
+include Comparable
 # card_test.rb : Tests for your card class
 # deck_test.rb : Tests for your deck class
 
-
 # Requirements
-# You should create classes for your data, and use methods instead of having one big loop
+# You should create classes for your data,
+# and use methods instead of having one big loop
+class Blackjack
+  attr_accessor :deck, :p1_hand, :dealer_hand, :hand_total, :hit_stand, :busted
+
+  def initialize
+    @deck = Deck.new
+    @p1_hand = []
+    @dealer_hand = []
+    @prompt = TTY::Prompt.new
+    @hand_total = hand_total
+    @hit_stand = hit_stand
+    @busted = false
+
+    build_hands
+  end
+
+  def build_hands
+    2.times do
+      @p1_hand << deck.draw_a_card
+    end
+    2.times do
+      @dealer_hand << deck.draw_a_card
+    end
+  end
+
+  def total_hands(player)
+    hand_total = player.map(&:value).reduce(:+)
+  end
+
+  def play
+      show_player_hand
+      if total_hands(p1_hand) == 21
+        winner
+      else
+      show_dealer_last
+      player_turn
+      end
+  end
+
+  def show_player_hand
+    puts 'Player 1 Hand: '
+    puts "You have #{p1_hand.join(' and ')}."
+    puts "Your hand total is: #{total_hands(p1_hand)}"
+    puts '==============='
+  end
+
+  def player_turn
+    if busted || total_hands(p1_hand) <= 21
+      hit_or_stand
+      show_dealer_last
+    elsif total_hands(p1_hand) == 21
+      winner
+    end
+  end
+
+  def show_dealer_last
+    puts "Dealer is showing #{dealer_hand.last}"
+    # puts "Debugging: Dealer's Hand total is: #{total_hands(dealer_hand)}"
+    puts '==============='
+  end
+
+  def show_dealer_all
+    puts "Dealer is showing #{dealer_hand.join(' and ')}."
+    puts "The dealer's hand totals #{total_hands(dealer_hand)}."
+  end
+
+  def dealer_turn
+    until total_hands(dealer_hand) > 16 do
+      dealer_hand << deck.draw_a_card
+      puts "The dealer is drawing a card..."
+      show_dealer_all
+    end
+  end
+
+  def winner
+    catchphrase = "You win with #{total_hands(p1_hand)}!"
+    if total_hands(p1_hand) > total_hands(dealer_hand)
+      puts catchphrase
+      new_game?
+    elsif total_hands(p1_hand) > 21
+      puts "Oh no! You busted! The dealer wins with #{total_hands(dealer_hand)}!"
+      busted = true
+      new_game?
+      return busted
+    elsif total_hands(p1_hand) == 21
+      puts catchphrase
+      new_game?
+    elsif total_hands(p1_hand) == total_hands(dealer_hand)
+      puts "Ties go to the player! #{catchphrase}"
+      new_game?
+    elsif total_hands(dealer_hand) > 21
+      puts "The dealer busted with #{total_hands(dealer_hand)}! #{catchphrase}"
+      new_game?
+    else
+      puts "The dealer wins with #{total_hands(dealer_hand)}. Sad story, bruh."
+      new_game?
+    end
+  end
+
+  def hit_or_stand
+    hit_stand = @prompt.yes?("Would you like to hit?")
+      if hit_stand
+        p1_hand << deck.draw_a_card
+        total_hands(p1_hand)
+        show_player_hand
+        player_turn
+        hit_stand = true
+      else
+        hit_stand = false
+        dealer_turn
+        winner
+      end
+  end
+
+  def new_game?
+    play_again = @prompt.yes?("Would you like to play again?")
+      if play_again
+        Blackjack.new.play
+      else
+        exit
+      end
+  end
+
+
+
+end
+Blackjack.new.play
+
+# binding.pry
+
+# puts "Would you like to (H)it or (S)tand?"
+#   response = gets.chomp.downcase
+# if response == "h"
+#   @p1_hand << game.p1_hand.deck.draw_a_card
+#   @hand_total += game.p1_hand.last.value
+#   puts "You have #{game.p1_hand.join(" and ")}"
+#   puts "Would you like to (H)it or (S)tand?"
+# else
+#   puts "You (won) || (lost)"
+#     exit
+# end
 
 ### Explorer Mode ###
-# Don't consider Aces as possible 1's ... they are always 11s (this means you can bust on the deal)
+# Don't consider Aces as possible 1's ... they are always 11s
+# (this means you can bust on the deal)
 # This is a 2 hand game (dealer and player)
 # no splitting or funny business
 # 1 deck in the game
@@ -45,86 +189,3 @@
 # Support for splitting.
 # Have an advisor along the way that optionally gives a hint to the play on their best move.
 # Additional Resources
-
-require_relative 'deck.rb'
-require_relative 'card.rb'
-require 'tty'
-require 'pry'
-
-class Game
-
-  attr_accessor :player1,
-                :player2,
-                :p1_current_card,
-                :p2_current_card,
-                :rounds,
-                :ties
-
-  def initialize
-    @player1 = Deck.new
-    @player2 = Deck.new
-    @p1_current_card = p1_current_card
-    @p2_current_card = p2_current_card
-    @rounds = 0
-    @ties = 0
-
-  end
-
-  prompt = TTY::Prompt.new
-
-  while prompt.yes?("Would you like to play a game of War?")
-
-    player1 = Deck.new
-    player2 = Deck.new
-
-    puts "This is Player 1's deck"
-    puts player1.inspect
-    binding.pry
-    puts "========================"
-    puts "\n"
-    puts "This is Player 2's deck"
-    puts player2.inspect
-
-  end
-
-  def new_game
-  end
-
-  def draw_a_card
-    #Setup arrays to collect the winning cards.
-    #This will be used later to declare the winner.
-    player1_winnings = []
-    player2_winnings = []
-
-    #Setup arrays to collect the discarded cards in case of a tie
-    discard = []
-
-
-    #Setup arrays to hold the current card for each player for comparison
-    #Each card will be pushed out of the array after it's been compared
-    self.p1_current_card = []
-    self.p2_current_card = []
-    self.p1_current_card << player1.draw_a_card
-    self.p2_current_card << player2_draw_a_card
-  end
-
-  def compare_cards
-   if p1_current_card > p2_current_card
-     player1_winnings << p1_current_card
-     player1_winnings << p2_current_card
-   elsif p1_current_card < p2_current_card
-     player2_winnings << p1_current_card
-     player2_winnings << p2_current_card
-   else
-     discard << p1_current_card
-     discard << p2_current_card
-   end
-  end
-
-  def end_game
-  end
-
-  def round_counter
-  end
-
-end
