@@ -45,7 +45,7 @@ class Blackjack
   end
 
   def total_hands(player)
-    hand_total = player.map(&:value).reduce(:+)
+    player.map(&:value).reduce(:+)
   end
 
   def play
@@ -71,7 +71,7 @@ class Blackjack
   def player_turn
       if total_hands(p1_hand) == 21
         winner
-      elsif total_hands(p1_hand) <= 21
+      elsif total_hands(p1_hand) < 21
         hit_or_stand
         show_dealer_last
       else
@@ -177,40 +177,3 @@ class Blackjack
 #End of Class
 end
 Blackjack.new.play
-
-### Explorer Mode ###
-# Don't consider Aces as possible 1's ... they are always 11s
-# (this means you can bust on the deal)
-# This is a 2 hand game (dealer and player)
-# no splitting or funny business
-# 1 deck in the game
-# 52 card deck
-# NO WILDS
-# New deck every game
-# deck must be shuffled every game
-# no betting at all
-# must have suits (ace of diamonds) = Working
-# Dealer hits if less than 16, otherwise dealer stays = Working
-# You enter what you play (hit or stay) = Working
-# No if you get 5 cards you win funnybusiness
-# get as close to 21 without going over = Working
-# Must beat the dealer = Working
-# you can see 1 of dealers cards, while you are playing and both when your hand is over. = Working
-# If you get blackjack, you win automagically = Working
-# Ties go to the player = Working
-
-### Adventure Mode ###
-# You win if you have 6 cards and stay under 21
-# Dealer wins if it draws blackjack before any player actions  = Tested and working
-# Ties go to the hand with the most cards, if still tied, it goes to the player - Tested and working
-
-### Epic Mode ###
-# Add the idea of tracking your progress as you play over time.
-# Let the player choose if an Ace is a 1 or an 11, or do it automatically.
-# Add 7 decks to the game in a "Shoe", shuffle them all together, deal from the "Shoe"
-
-### Legendary Mode ###
-# Tests for the game itself.
-# Support for splitting.
-# Have an advisor along the way that optionally gives a hint to the play on their best move.
-# Additional Resources
